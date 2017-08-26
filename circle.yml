@@ -23,6 +23,7 @@ jobs:
           name: Package release
           working_directory: src/NYoutubeDL
           command: |
+            dotnet build -c Release
             dotnet pack -c Release
       - store_artifacts:
           path: src/NYoutubeDL/bin/Release
