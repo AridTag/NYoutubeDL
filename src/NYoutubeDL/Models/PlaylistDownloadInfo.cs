@@ -18,6 +18,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using Newtonsoft.Json;
+
 namespace NYoutubeDL.Models
 {
     #region Using
@@ -76,16 +81,22 @@ namespace NYoutubeDL.Models
 
         internal override void ParseOutput(object sender, string output)
         {
-            if (output.Contains(VIDEOSTRING) && output.Contains(OFSTRING))
+            dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(output);
+            if (((IDictionary<String, object>)result).ContainsKey("playlist_index"))
             {
-                Regex regex = new Regex(".*?(\\d+)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-                Match match = regex.Match(output);
-                if (match.Success)
-                {
-                    this.VideoIndex = int.Parse(match.Groups[1].ToString());
-                    this.CurrentVideo = this.Videos[this.videoIndex - 1];
-                }
+                this.VideoIndex = (int)result.playlist_index;
+                this.CurrentVideo = this.Videos[this.videoIndex - 1];
             }
+            //if (output.Contains(VIDEOSTRING) && output.Contains(OFSTRING))
+            //{
+            //    Regex regex = new Regex(".*?(\\d+)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            //    Match match = regex.Match(output);
+            //    if (match.Success)
+            //    {
+            //        this.VideoIndex = int.Parse(match.Groups[1].ToString());
+            //        this.CurrentVideo = this.Videos[this.videoIndex - 1];
+            //    }
+            //}
 
             this.CurrentVideo?.ParseOutput(sender, output);
             base.ParseOutput(sender, output);

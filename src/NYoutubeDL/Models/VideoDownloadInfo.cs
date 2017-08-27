@@ -18,6 +18,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+using System.Dynamic;
+using Newtonsoft.Json;
+
 namespace NYoutubeDL.Models
 {
     #region Using
@@ -41,7 +45,8 @@ namespace NYoutubeDL.Models
             this.Description = info.description;
             this.DislikeCount = info.dislike_count;
             this.DisplayId = info.display_id;
-            this.Duration = info.duration;
+            if(info.duration.HasValue)
+                this.Duration = info.duration.Value;
             this.Ext = info.ext;
             this.Extractor = info.extractor;
             this.ExtractorKey = info.extractor_key;
@@ -98,6 +103,7 @@ namespace NYoutubeDL.Models
             this.WebpageUrl = info.webpage_url;
             this.WebpageUrlBasename = info.webpage_url_basename;
             this.Width = info.width;
+            this.OutputFileName = info._filename;
         }
 
         public string Acodec { get; }
@@ -116,7 +122,7 @@ namespace NYoutubeDL.Models
 
         public string DisplayId { get; }
 
-        public int? Duration { get; }
+        public long Duration { get; private set; }
 
         public string Ext { get; set; }
 
@@ -168,7 +174,7 @@ namespace NYoutubeDL.Models
 
         public int? ViewCount { get; }
 
-        public string WebpageUrl { get; }
+        public string WebpageUrl { get; private set; }
 
         public string WebpageUrlBasename { get; }
 
@@ -179,8 +185,28 @@ namespace NYoutubeDL.Models
         /// </summary>
         public string Id { get; }
 
+        public string OutputFileName { get; private set; }
+
         public List<ThumbnailDownloadInfo> Thumbnails { get; } = new List<ThumbnailDownloadInfo>();
 
         public List<string> Tags { get; }
+
+        internal override void ParseOutput(object sender, string output)
+        {
+            dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(output);
+            var resultDictionary = (IDictionary<string, object>)result;
+
+            if (resultDictionary.ContainsKey("_filename"))
+                OutputFileName = result._filename;
+
+            if (resultDictionary.ContainsKey("duration"))
+                Duration = result.duration;
+
+            if (resultDictionary.ContainsKey("title"))
+                Title = Title;
+
+            if (resultDictionary.ContainsKey("webpage_url"))
+                WebpageUrl = result.webpage_url;
+        }
     }
 }

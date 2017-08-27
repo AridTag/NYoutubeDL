@@ -18,6 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Dynamic;
+
 namespace NYoutubeDL.Models
 {
     #region Using
@@ -203,6 +205,8 @@ namespace NYoutubeDL.Models
 
         internal virtual void ParseOutput(object sender, string output)
         {
+            dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(output);
+
             if (output.Contains("%"))
             {
                 //int progressIndex = output.LastIndexOf(' ', output.IndexOf('%')) + 1;

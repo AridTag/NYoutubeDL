@@ -34,6 +34,8 @@ namespace NYoutubeDL.Models
     {
         public string _type { get; set; }
 
+        public string _filename { get; set; }
+
         public int? abr { get; set; }
 
         public string acodec { get; set; }
@@ -56,7 +58,7 @@ namespace NYoutubeDL.Models
 
         public string display_id { get; set; }
 
-        public int? duration { get; set; }
+        public long? duration { get; set; }
 
         public object end_time { get; set; }
 
